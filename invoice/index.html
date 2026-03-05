@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="./invoice.css">
     <link rel="stylesheet" href="./invoice-pdf.css">
     <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
-    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"></script>
+    <!-- <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"></script> -->
 </head>
 <body style="margin:0; padding:0; background-color:#0000;">
     <div class="logo-container">
@@ -14,7 +14,7 @@
     <table class="invoice-info-container">
         <tr>
             <td rowspan="2" class="client-name">
-                <span data-text="$customer_name"></span>
+                <span id="el-customer_name"></span>
                 {Customer_Name}
             </td>
             <td>

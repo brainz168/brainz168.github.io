@@ -29,8 +29,9 @@ function initGrist() {
     log({ record });
     const mapped = grist.mapColumnNames(record);
     log({ mapped });
-    const customer = mapped.Customer;
-    log(customer)
+    const customer_name = mapped.Customer;
+    log(customer_name);
+    document.getElementById("el-customer_name").textContent = customer_name
     // const graphDefinition = mapped.mermaid;
     // log({ graphDefinition });
     // runMermaid(graphDefinition).then((svg) => {
@@ -42,21 +43,21 @@ function initGrist() {
 
 ready(initGrist);
 
-const testing = false;
-if (testing) {
-  const g = `---
-title: "Grades"
----
-radar-beta
-  axis m["Math"], s["Science"], e["English"]
-  axis h["History"], g["Geography"], a["Art"]
-  curve a["Alice"]{85, 90, 80, 70, 75, 90}
-  curve b["Bob"]{70, 75, 85, 80, 90, 85}
+// const testing = false;
+// if (testing) {
+//   const g = `---
+// title: "Grades"
+// ---
+// radar-beta
+//   axis m["Math"], s["Science"], e["English"]
+//   axis h["History"], g["Geography"], a["Art"]
+//   curve a["Alice"]{85, 90, 80, 70, 75, 90}
+//   curve b["Bob"]{70, 75, 85, 80, 90, 85}
 
-  max 100
-  min 0
-`;
-  const t = await runMermaid(g);
-  const el = document.getElementById("mermaid-test");
-  el.innerHTML = t;
-}
+//   max 100
+//   min 0
+// `;
+//   const t = await runMermaid(g);
+//   const el = document.getElementById("mermaid-test");
+//   el.innerHTML = t;
+// }
