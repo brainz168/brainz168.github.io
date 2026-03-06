@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Grist Invoice</title>
+
+    <!-- Migrated to Datastar from Vue -->
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+    <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+    <script src="invoice.js?ver=11"></script> <!-- Updated JS -->
+    <script src="exampleData.js"></script>
+
+    <link rel="stylesheet" href="invoice.css?ver=17">
+  </head>
+  <body>
+    <div id="app" data-signals="{count: 0, invoice: null, status: 'waiting', tableConnected: false, rowConnected: false, haveRows: false}">
+      <!-- Hidden divs for event handling -->
+      <div data-on:update-invoice__window="try { $invoice = updateInvoice(evt.detail); $status = ''; } catch (err) { $status = String(err).replace(/^Error: /, ''); console.error(err); }"></div>
+      <div data-on:set-table-connected__window="$tableConnected = evt.detail"></div>
+      <div data-on:set-row-connected__window="$rowConnected = evt.detail"></div>
+      <div data-on:set-have-rows__window="$haveRows = evt.detail"></div>
+
+      <div class="status" data-show="$status">
+        <div data-show="$status === 'waiting'">
+          <p>Waiting for data...</p>
+          <ul>
+            <li data-class:done="$tableConnected">I need <b>read table</b> access.</li>
+            <li data-class:done="$haveRows">I need at least one row of data.</li>
+            <li data-class:done="$rowConnected">I need <b>Select By</b> set.</li>
+          </ul>
+          <p>Examples:</p>
+          <ul>
+            <li><a class="button" href="index.html?demo=1">A filled out invoice</a></li>
+            <li><a class="button" href="index.html?labels=1">A labelled invoice</a></li>
+          </ul>
+        </div>
+        <div data-show="$status !== 'waiting' && $status" data-text="$status"></div>
+      </div>
+      <div class="invoice" data-show="$invoice">
+        <div class="top">
+          <div class="block">
+            <div class="header">
+              <div class="meta title">Invoice</div>
+            </div>
+            <div class="info"><span class="meta">Invoice Number</span> #<span data-text="$invoice.Number"></span></div>
+            <div class="info" data-show="$invoice.Issued"><div class="meta date-tag">Issued</div> <span data-text="asDate($invoice.Issued)"></span></div>
+            <div class="info" data-show="$invoice.Due"><div class="meta date-tag">Due</div> <span data-text="asDate($invoice.Due)"></span></div>
+          </div>
+          
+          <div class="supplier" data-effect="el.innerHTML = renderInvoicer($invoice.Invoicer ? [$invoice.Invoicer] : [])"></div>
+        </div>
+        
+        <div data-effect="el.innerHTML = renderClient($invoice.Client ? [$invoice.Client] : [])"></div>
+
+        <table class="items" data-effect="el.innerHTML = renderItems($invoice.Items, $invoice.Total)"></table>
+
+        <div class="summary">
+          <div class="part">
+            <div class="title">Subtotal</div>
+            <div class="details" data-text="currency($invoice.Subtotal)"></div>
+          </div>
+          <div class="part">
+            <div class="title">Deduction</div>
+            <div class="details" data-text="currency($invoice.Deduction)"></div>
+          </div>
+          <div class="part">
+            <div class="title">Taxes</div>
+            <div class="details" data-text="currency($invoice.Taxes)"></div>
+          </div>
+          <div class="total">
+            <div class="title">Total</div>
+            <div class="details" data-text="currency($invoice.Total)"></div>
+          </div>
+        </div>
+
+        <p class="note" data-show="$invoice.Note" data-text="$invoice.Note"></p>
+
+        <div data-effect="el.innerHTML = renderHelp($invoice.Help ? [$invoice.Help] : [], $invoice.SuggestReferencesColumn)"></div>
+
+        <div class="paid" data-show="$invoice.Paid">
+          PAID
+        </div>
+
+        <div class="footer">
+          <div class="thanks">
+            Thank you!
+          </div>
+        </div>
+
+        <div class="print">
+          <a href="javascript:window.print()">Print</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
