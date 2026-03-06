@@ -1,4 +1,4 @@
-const exampleData = {
+var exampleData = {
   Number: 14999,
   Issued: Date.parse('2020-10-12') / 1000,
   Due: Date.parse('2020-11-12') / 1000,
@@ -44,3 +44,5 @@ const exampleData = {
   Total: 615,
   Paid: true,
 };
+window.exampleData = exampleData;
+

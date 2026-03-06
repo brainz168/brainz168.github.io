@@ -227,7 +227,24 @@ function renderHelp(helps, suggest) {
     return `<div class="help"><div class="help-close">Add <span class="column-name">Due</span> or <span class="column-name">Issued</span> date to hide this help.</div><div class="title">Column information</div><div class="details"><table>${tableHtml}</table>${suggestHtml}</div></div>`;
   }).join('');
 }
-
+window.dispatchDemoIfNeeded = function() {
+  const search = document.location.search;
+  if (search.includes('demo')) {
+    console.log('Dispatching demo event with data:', window.exampleData);  // Debug log
+    if (!window.exampleData) {
+      console.error('exampleData is undefined! Check exampleData.js.');
+      return;
+    }
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('update-invoice', { detail: window.exampleData }));
+    }, 500);  // 0.5s delay to ensure Datastar is fully initialized
+  }else if(search.includes('labels')) {
+    console.log('Dispatching demo event with labels');  // Debug log
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('update-invoice', { detail: {} }));
+    }, 500);  // 0.5s delay to ensure Datastar is fully initialized
+  }
+};
 ready(function() {
   const search = document.location.search;
 
@@ -260,12 +277,5 @@ ready(function() {
     });
   } catch (e) {
     console.error('Grist API error (likely standalone mode):', e);
-  }
-
-  if (search.includes('demo')) {
-    window.dispatchEvent(new CustomEvent('update-invoice', {detail: exampleData}));
-  }
-  if (search.includes('labels')) {
-    window.dispatchEvent(new CustomEvent('update-invoice', {detail: {}}));
   }
 });
