@@ -229,34 +229,39 @@ function renderHelp(helps, suggest) {
 }
 
 ready(function() {
-  // Update the invoice anytime the document data changes.
-  grist.ready();
-  grist.onRecord(row => {
-    window.dispatchEvent(new CustomEvent('update-invoice', {detail: row}));
-  });
-
-  // Monitor status so we can give user advice.
-  let tableConnected = false;
-  let rowConnected = false;
-  let haveRows = false;
-  grist.on('message', msg => {
-    if (msg.tableId && !rowConnected) {
-      grist.docApi.fetchSelectedTable().then(table => {
-        haveRows = table.id && table.id.length >= 1;
-        window.dispatchEvent(new CustomEvent('set-have-rows', {detail: haveRows}));
-      }).catch(e => console.log(e));
-    }
-    if (msg.tableId) {
-      tableConnected = true;
-      window.dispatchEvent(new CustomEvent('set-table-connected', {detail: tableConnected}));
-    }
-    if (msg.tableId && !msg.dataChange) {
-      rowConnected = true;
-      window.dispatchEvent(new CustomEvent('set-row-connected', {detail: rowConnected}));
-    }
-  });
-
   const search = document.location.search;
+
+  // Wrap Grist API calls in try-catch to handle standalone mode where Grist parent may not exist
+  try {
+    grist.ready();
+    grist.onRecord(row => {
+      window.dispatchEvent(new CustomEvent('update-invoice', {detail: row}));
+    });
+
+    // Monitor status so we can give user advice.
+    let tableConnected = false;
+    let rowConnected = false;
+    let haveRows = false;
+    grist.on('message', msg => {
+      if (msg.tableId && !rowConnected) {
+        grist.docApi.fetchSelectedTable().then(table => {
+          haveRows = table.id && table.id.length >= 1;
+          window.dispatchEvent(new CustomEvent('set-have-rows', {detail: haveRows}));
+        }).catch(e => console.log(e));
+      }
+      if (msg.tableId) {
+        tableConnected = true;
+        window.dispatchEvent(new CustomEvent('set-table-connected', {detail: tableConnected}));
+      }
+      if (msg.tableId && !msg.dataChange) {
+        rowConnected = true;
+        window.dispatchEvent(new CustomEvent('set-row-connected', {detail: rowConnected}));
+      }
+    });
+  } catch (e) {
+    console.error('Grist API error (likely standalone mode):', e);
+  }
+
   if (search.includes('demo')) {
     window.dispatchEvent(new CustomEvent('update-invoice', {detail: exampleData}));
   }
