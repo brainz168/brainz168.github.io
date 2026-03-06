@@ -116,7 +116,7 @@ function updateInvoice(row) {
   if (row === null) {
     throw new Error("(No data - not on row - please add or select a row)");
   }
-  console.log("GOT...", JSON.stringify(row));
+//   console.log("GOT...", JSON.stringify(row));
   if (row.References) {
     try {
       Object.assign(row, row.References);
@@ -173,14 +173,18 @@ function renderInvoicer(arr) {
     if (typeof business === 'string') {
       return `<div class="address newlined">${business}</div>`;
     } else {
-      let html = `<div class="address"><span class="name">${business.Name || ''}</span><br />${business.Street1 || ''}<br />`;
-      if (business.Street2) html += `${business.Street2}<br />`;
-      html += `${business.City || ''} ${business.State || ''} ${business.Zip || ''}<br />`;
-      if (business.Country) html += `${business.Country}<br />`;
-      html += `</div>`;
-      if (business.Email) html += `<div class="email">${business.Email}</div>`;
-      if (business.Phone) html += `<div class="phone">${business.Phone}</div>`;
-      if (business.Website) html += `<div class="website"><a href="${business.Url || ''}">${business.Website}</a></div>`;
+      let html = `
+        <div class="address">
+          <span class="name">${business.Name || ''}</span><br />
+          ${business.Street1 || ''}<br />
+          ${business.Street2 ? `${business.Street2}<br />` : ''}
+          ${business.City || ''} ${business.State || ''} ${business.Zip || ''}<br />
+          ${business.Country ? `${business.Country}<br />` : ''}
+        </div>
+        ${business.Email ? `<div class="email">${business.Email}</div>` : ''}
+        ${business.Phone ? `<div class="phone">${business.Phone}</div>` : ''}
+        ${business.Website ? `<div class="website"><a href="${business.Url || ''}">${business.Website}</a></div>` : ''}
+      `
       return html;
     }
   }).join('');
@@ -230,7 +234,7 @@ function renderHelp(helps, suggest) {
 window.dispatchDemoIfNeeded = function() {
   const search = document.location.search;
   if (search.includes('demo')) {
-    console.log('Dispatching demo event with data:', window.exampleData);  // Debug log
+    // console.log('Dispatching demo event with data:', window.exampleData);  // Debug log
     if (!window.exampleData) {
       console.error('exampleData is undefined! Check exampleData.js.');
       return;
@@ -239,7 +243,7 @@ window.dispatchDemoIfNeeded = function() {
       window.dispatchEvent(new CustomEvent('update-invoice', { detail: window.exampleData }));
     }, 500);  // 0.5s delay to ensure Datastar is fully initialized
   }else if(search.includes('labels')) {
-    console.log('Dispatching demo event with labels');  // Debug log
+    // console.log('Dispatching demo event with labels');  // Debug log
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent('update-invoice', { detail: {} }));
     }, 500);  // 0.5s delay to ensure Datastar is fully initialized
