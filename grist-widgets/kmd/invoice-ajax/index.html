@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Grist Invoice</title>
+  <head>
+    <meta charset="utf-8">
+    <title>Grist Invoice</title>
 
-  <!-- ✅ Correct Alpine + Alpine-AJAX order -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.7/dist/cdn.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+    <!-- ✅ Alpine + Alpine-AJAX (exactly as you specified) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.7/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
-  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+    <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
 
-  <script src="invoice.js?ver=11"></script>
-  <script src="exampleData.js"></script>
+    <script src="invoice.js?ver=11"></script>
+    <script src="exampleData.js"></script>
 
-  <link rel="stylesheet" href="invoice.css?ver=17">
-</head>
+    <link rel="stylesheet" href="invoice.css?ver=17">
+  </head>
   <body>
-    <div id="app" x-data="invoiceWidget()">
-      <!-- Event listeners (replaces Datastar data-on:...) -->
+    <div id="app" 
+         x-data="invoiceWidget()" 
+         x-init="initDemoIfNeeded()">
+
+      <!-- Hidden divs for event handling (replaces Datastar data-on:...) -->
       <div @update-invoice.window="handleUpdateInvoice($event.detail)"></div>
       <div @set-table-connected.window="tableConnected = $event.detail"></div>
       <div @set-row-connected.window="rowConnected = $event.detail"></div>
@@ -92,7 +95,9 @@
         </div>
 
         <div class="footer">
-          <div class="thanks">Thank you!</div>
+          <div class="thanks">
+            Thank you!
+          </div>
         </div>
 
         <div class="print">
@@ -101,7 +106,7 @@
       </div>
     </div>
 
-    <!-- Alpine component definition -->
+    <!-- Alpine component -->
     <script>
       function invoiceWidget() {
         return {
@@ -118,6 +123,15 @@
             } catch (err) {
               this.status = String(err).replace(/^Error: /, '')
               console.error(err)
+            }
+          },
+
+          // Makes ?demo=1 and ?labels=1 links work again
+          initDemoIfNeeded() {
+            if (typeof window.dispatchDemoIfNeeded === 'function') {
+              setTimeout(() => {
+                window.dispatchDemoIfNeeded()
+              }, 300)
             }
           }
         }
