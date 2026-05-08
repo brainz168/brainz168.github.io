@@ -12,7 +12,6 @@
     <script src="invoice.js?ver=11"></script> <!-- Updated JS -->
     <script src="exampleData.js"></script>
 
-    <script type="module" src="my-widget.js"></script>
     <link rel="stylesheet" href="invoice.css?ver=17">
   </head>
   <body>
@@ -22,12 +21,6 @@
       <div data-on:set-table-connected__window="$tableConnected = evt.detail"></div>
       <div data-on:set-row-connected__window="$rowConnected = evt.detail"></div>
       <div data-on:set-have-rows__window="$haveRows = evt.detail"></div>
-
-
-      <my-element>
-        <p>Todo: Define <code>my-element</code>!</p>
-      </my-element>
-      <grist-widget></grist-widget>
 
       <div class="status" data-show="$status">
         <div data-show="$status === 'waiting'">

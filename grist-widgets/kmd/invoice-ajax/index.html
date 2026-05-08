@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Grist Invoice</title>
+
+  <!-- ✅ Correct Alpine + Alpine-AJAX order -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@imacrayon/alpine-ajax@0.12.7/dist/cdn.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+
+  <script src="invoice.js?ver=11"></script>
+  <script src="exampleData.js"></script>
+
+  <link rel="stylesheet" href="invoice.css?ver=17">
+</head>
+  <body>
+    <div id="app" x-data="invoiceWidget()">
+      <!-- Event listeners (replaces Datastar data-on:...) -->
+      <div @update-invoice.window="handleUpdateInvoice($event.detail)"></div>
+      <div @set-table-connected.window="tableConnected = $event.detail"></div>
+      <div @set-row-connected.window="rowConnected = $event.detail"></div>
+      <div @set-have-rows.window="haveRows = $event.detail"></div>
+
+      <div class="status" x-show="status">
+        <div x-show="status === 'waiting'">
+          <p>Waiting for data...</p>
+          <ul>
+            <li :class="{ done: tableConnected }">I need <b>read table</b> access.</li>
+            <li :class="{ done: haveRows }">I need at least one row of data.</li>
+            <li :class="{ done: rowConnected }">I need <b>Select By</b> set.</li>
+          </ul>
+          <p>Examples:</p>
+          <ul>
+            <li><a class="button" href="index.html?demo=1">A filled out invoice</a></li>
+            <li><a class="button" href="index.html?labels=1">A labelled invoice</a></li>
+          </ul>
+        </div>
+        <div x-show="status !== 'waiting' && status" x-text="status"></div>
+      </div>
+
+      <div class="invoice" x-show="invoice">
+        <div class="top">
+          <div class="block">
+            <div class="header">
+              <div class="meta title">Invoice</div>
+            </div>
+            <div class="info"><span class="meta">Invoice Number</span> #<span x-text="invoice ? invoice.Number : ''"></span></div>
+            <div class="info" x-show="invoice && invoice.Issued"><div class="meta date-tag">Issued</div> <span x-text="asDate(invoice.Issued)"></span></div>
+            <div class="info" x-show="invoice && invoice.Due"><div class="meta date-tag">Due</div> <span x-text="asDate(invoice.Due)"></span></div>
+          </div>
+          
+          <div class="supplier" 
+               x-html="renderInvoicer(invoice && invoice.Invoicer ? [invoice.Invoicer] : [])"></div>
+        </div>
+        
+        <div x-html="renderClient(invoice && invoice.Client ? [invoice.Client] : [])"></div>
+
+        <table class="items" 
+               x-html="invoice ? renderItems(invoice.Items, invoice.Total) : ''"></table>
+
+        <div class="summary">
+          <div class="part">
+            <div class="title">Subtotal</div>
+            <div class="details" x-text="invoice ? currency(invoice.Subtotal) : ''"></div>
+          </div>
+          <div class="part">
+            <div class="title">Deduction</div>
+            <div class="details" x-text="invoice ? currency(invoice.Deduction) : ''"></div>
+          </div>
+          <div class="part">
+            <div class="title">Taxes</div>
+            <div class="details" x-text="invoice ? currency(invoice.Taxes) : ''"></div>
+          </div>
+          <div class="total">
+            <div class="title">Total</div>
+            <div class="details" x-text="invoice ? currency(invoice.Total) : ''"></div>
+          </div>
+        </div>
+
+        <p class="note" x-show="invoice && invoice.Note" x-text="invoice.Note"></p>
+
+        <div x-html="renderHelp(
+          invoice && invoice.Help ? [invoice.Help] : [], 
+          invoice ? invoice.SuggestReferencesColumn : false
+        )"></div>
+
+        <div class="paid" x-show="invoice && invoice.Paid">
+          PAID
+        </div>
+
+        <div class="footer">
+          <div class="thanks">Thank you!</div>
+        </div>
+
+        <div class="print">
+          <a href="javascript:window.print()">Print</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alpine component definition -->
+    <script>
+      function invoiceWidget() {
+        return {
+          invoice: null,
+          status: 'waiting',
+          tableConnected: false,
+          rowConnected: false,
+          haveRows: false,
+
+          handleUpdateInvoice(detail) {
+            try {
+              this.invoice = updateInvoice(detail)
+              this.status = ''
+            } catch (err) {
+              this.status = String(err).replace(/^Error: /, '')
+              console.error(err)
+            }
+          }
+        }
+      }
+    </script>
+  </body>
+</html>
